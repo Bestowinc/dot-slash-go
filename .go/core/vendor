@@ -1,6 +1,29 @@
 #!/usr/bin/env bash
 
-# set the vars: proj_root SCRIPT_PATH
-. "$ROOT_DIR/.go/core/.vendor/github.com/brettlangdon/git-vendor/bin/git-vendor"
+core_dir=$(dirname ${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]})
+vendor="$core_dir/.vendor/github.com/brettlangdon/git-vendor/bin/git-vendor" 
 
-git-vendor "$@"
+_usage()
+{
+    cat <<EOF
+Usage:
+  vendor --help
+  vendor add [--prefix <dir>] <name> <repository> [<ref>]
+  vendor list [<name>]
+  vendor remove <name>
+  vendor update <name> [<ref>]
+EOF
+}
+
+case "$1" in
+    ""|"--help") _usage && exit ;;
+esac
+
+command="$1"
+shift
+case "$command" in
+    "add"|"list"|"remove"|"update") ;;
+    *) >&2 echo "error: unknown command \"$command\"" && _usage && exit 1 ;;
+esac
+
+"$vendor" "$command"
