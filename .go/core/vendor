@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
 # set the vars: proj_root SCRIPT_PATH
-echo $ROOT_DIR
-ls $ROOT_DIR
+. "$ROOT_DIR/.go/core/.vendor/github.com/brettlangdon/git-vendor/bin/git-vendor"
+
+git-vendor "$@"
