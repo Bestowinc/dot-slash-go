@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
 core_dir=$(dirname ${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]})
-vendor="$core_dir/.vendor/github.com/brettlangdon/git-vendor/bin/git-vendor" 
+vendor="$core_dir/.vendor/github.com/brettlangdon/git-vendor/bin/git-vendor"
 
-_usage()
-{
-    cat <<EOF
+_usage() {
+	cat <<EOF
 Usage:
   vendor --help
   vendor add [--prefix <dir>] <name> <repository> [<ref>]
@@ -16,14 +15,32 @@ EOF
 }
 
 case "$1" in
-    ""|"--help") _usage && exit ;;
+"" | "--help") _usage && exit ;;
 esac
 
 command="$1"
 shift
 case "$command" in
-    "add"|"list"|"remove"|"update") ;;
-    *) >&2 echo "error: unknown command \"$command\"" && _usage && exit 1 ;;
+"add" | "list" | "remove" | "update") ;;
+*) echo >&2 "error: unknown command \"$command\"" && _usage && exit 1 ;;
 esac
 
-"$vendor" "$command"
+args=("${@}")
+
+function default_prefix() {
+	if [[ "$command" == "add" ]]; then
+		local prefix_called=""
+		for arg in "$@"; do
+			if [[ "$arg" == "--prefix" ]]; then
+				prefix_called="true"
+			fi
+		done
+		if [[ $prefix_called == "true" ]]; then
+			args=("--prefix" "../.vendor" "${args[@]}")
+		fi
+	fi
+}
+
+default_prefix
+
+"$vendor" "$command" "$args"
