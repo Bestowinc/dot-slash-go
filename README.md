@@ -1,8 +1,8 @@
-# dot-slash-go [![Build Status](https://travis-ci.org/bromanko/dot-slash-go.svg?branch=master)](https://travis-ci.org/bromanko/dot-slash-go)
+# dot-slash-go [![Build Status](https://travis-ci.org/Bestowinc/dot-slash-go.svg?branch=master)](https://travis-ci.org/Bestowinc/dot-slash-go)
 
 An extensible, friendly framework for project [go scripts](https://www.thoughtworks.com/insights/blog/praise-go-script-part-i).
 
-![dot-slash-go Example](https://github.com/bromanko/dot-slash-go/raw/master/example.png)
+![dot-slash-go Example](https://github.com/Bestowinc/dot-slash-go/raw/master/example.png)
 
 ## Features
 
@@ -15,7 +15,7 @@ An extensible, friendly framework for project [go scripts](https://www.thoughtwo
 In your project root:
 
 ```sh
-bash -c "$(curl -sS https://raw.githubusercontent.com/bromanko/dot-slash-go/master/install)"
+bash -c "$(curl -sS https://raw.githubusercontent.com/Bestowinc/dot-slash-go/master/install)"
 ```
 
 ## Customizing

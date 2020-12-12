@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ROOT_DIR=`dirname "$(pwd)/$0"`
+ROOT_DIR=`dirname "$(perl -e 'use Cwd "abs_path"; print abs_path(shift)' $0)"`
 CLI_ENTRYPOINT=`basename $0`
 
 COLOR_BLACK="\033[30m"
