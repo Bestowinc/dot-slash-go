@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 core_dir=$(dirname "${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]}")
-vendor="$core_dir/.vendor/github.com/brettlangdon/git-vendor/bin/git-vendor"
+vendor_cmd="$core_dir/.vendor/github.com/brettlangdon/git-vendor/bin/git-vendor"
+vendor_dir=".go/.vendor"
 
 _usage() {
 	cat <<EOF
@@ -36,11 +37,15 @@ function default_prefix() {
 			fi
 		done
 		if [ -z $prefix_called ]; then
-			args=("--prefix" "$ROOT_DIR/.go/.vendor" "${args[@]}")
+			args=("--prefix" "$vendor_dir" "${args[@]}")
 		fi
 	fi
 }
 
+if [ ! -d "$vendor_dir" ]; then
+	mkdir "$vendor_dir"
+fi
+
 default_prefix "${args[@]}"
 
-"$vendor" "$command" "${args[@]}"
+"$vendor_cmd" "$command" ${args[@]}
