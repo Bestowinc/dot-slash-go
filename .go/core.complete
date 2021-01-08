@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+OPTIONS=("vendor" "update")
+echo ${OPTIONS[@]}

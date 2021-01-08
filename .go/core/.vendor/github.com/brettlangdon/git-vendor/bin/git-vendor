@@ -8,11 +8,11 @@ _usage()
 {
     cat <<EOF
 Usage:
-  vendor --help
-  vendor add [--prefix <dir>] <name> <repository> [<ref>]
-  vendor list [<name>]
-  vendor remove <name>
-  vendor update <name> [<ref>]
+  git vendor --help
+  git vendor add [--prefix <dir>] <name> <repository> [<ref>]
+  git vendor list [<name>]
+  git vendor remove <name>
+  git vendor update <name> [<ref>]
 EOF
 }
 
