@@ -73,7 +73,7 @@ add() {
   fi
 
   # check for existence of vendor file and duplicate name/path
-  if [ ! -s "$VENDOR_FILE" ]; then
+  if [ -s "$VENDOR_FILE" ]; then
     grep -Eq "name:\s+$name" "$VENDOR_FILE" && die "name: $name already exists in git-vendor file"
     grep -Eq "path:\s+$path" "$VENDOR_FILE" && die "path: $path already exists in git-vendor file"
   fi
