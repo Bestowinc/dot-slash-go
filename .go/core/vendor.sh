@@ -3,8 +3,8 @@
 set -eof pipefail
 
 ROOT_DIR="${ROOT_DIR:-.}"
-VENDOR_FILE=${VENDOR_FILE:-"$ROOT_DIR/.go/.vendor-git"}
-VENDOR_DIR=${VENDOR_DIR:-".go/.vendor/git"}
+VENDOR_FILE=${VENDOR_FILE:-"$ROOT_DIR/.go/.git-vendor"}
+VENDOR_DIR=${VENDOR_DIR:-".go/.vendor"}
 PATH=$PATH:$(git --exec-path)
 # overrides location of ./go vendor add
 ADD_PATH="${ADD_PATH:-}"
