@@ -140,10 +140,10 @@ list() {
     "}")
       if [ "$repo" ]; then
         if [[ -z "$show_only" || "$show_only" = "$name" ]]; then
-          printf '%s@%s:\n' "$name" "$ref"
+          printf '\n%s@%s:\n' "$name" "$ref"
           printf '\tpath: %s\n' "$path"
           printf '\trepo: %s\n' "$repo"
-          printf '\tcommit: %s\n' "$commit"
+          printf '\tcommit: %s' "$commit"
           printf "\n"
         fi
       fi
