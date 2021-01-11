@@ -8,7 +8,7 @@ REMOVE="./go vendor remove <name>"
 UPDATE="./go vendor update <name> [<ref>]"
 ROOT_DIR="${ROOT_DIR:-.}"
 VENDOR_FILE=${VENDOR_FILE:-"$ROOT_DIR/.go/.git-vendor"}
-VENDOR_DIR=${VENDOR_DIR:-".go/.vendor"}
+VENDOR_DIR=${VENDOR_DIR:-".go/.vendor/git"}
 PATH=$PATH:$(git --exec-path)
 
 _usage() {
