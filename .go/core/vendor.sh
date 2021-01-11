@@ -61,19 +61,25 @@ add() {
     die "Incorrect options provided: $ADD"
   fi
   local name="$1"
-  grep -Eq "name:\s+$name" "$VENDOR_FILE" && die "name: $name already exists in git-vendor file"
   local repo="$2"
-  # get the default HEAD reaf from the remote repo
   local ref="$3"
   local commit
+  local path
+
+  path="$VENDOR_DIR/$(echo "$repo" | sed -E 's#^[a-zA-Z]+((://)|@)##' | sed 's#:#/#' | sed -E 's/\.git$//')"
+
+  # check for existence of vendor file and duplicate name/path
+  if [ ! -s "$VENDOR_FILE" ]; then
+    grep -Eq "name:\s+$name" "$VENDOR_FILE" && die "name: $name already exists in git-vendor file"
+    grep -Eq "path:\s+$path" "$VENDOR_FILE" && die "path: $path already exists in git-vendor file"
+  fi
+
+  # get the default HEAD reaf from the remote repo
   if [ -z "$ref" ]; then
     read -r ref commit <<<"$(get_repo_default "$repo")"
   else
     commit="$(get_commit "$repo" "$ref")"
   fi
-
-  path="$VENDOR_DIR/$(echo "$repo" | sed -E 's#^[a-zA-Z]+((://)|@)##' | sed 's#:#/#' | sed -E 's/\.git$//')"
-  grep -Eq "path:\s+$path" "$VENDOR_FILE" && die "path: $path already exists in git-vendor file"
 
   message=$(
     cat <<EOF
