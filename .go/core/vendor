@@ -100,10 +100,9 @@ EOF
 
   # append vendor file modification to same commit
   if [ ! -s "$VENDOR_FILE" ]; then
-    printf "# git-vendor #\n##############" >"$VENDOR_FILE"
+    printf "# git-vendor #\n##############\n" >"$VENDOR_FILE"
   fi
   cat <<EOF >>"$VENDOR_FILE"
-
 {
 	name:	$name
 	path:	$path
