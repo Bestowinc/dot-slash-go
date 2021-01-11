@@ -68,7 +68,7 @@ add() {
   local ref="$3"
   local commit
   local path="$ADD_PATH"
-  if [ -n "$path" ]; then
+  if [ -z "$path" ]; then
     path="$VENDOR_DIR/$(echo "$repo" | sed -E 's#^[a-zA-Z]+((://)|@)##' | sed 's#:#/#' | sed -E 's/\.git$//')"
   fi
 
