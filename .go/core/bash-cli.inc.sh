@@ -12,8 +12,10 @@ COLOR_LIGHT_GRAY="\033[37m"
 COLOR_DARK_GRAY="\033[38m"
 COLOR_NORMAL="\033[39m"
 
+ROOT_DIR="${ROOT_DIR:-.}"
+
 function bcli_resolve_path() {
-	echo "$ROOT_DIR"
+  echo "$ROOT_DIR"
 }
 
 function bcli_trim_whitespace() {
@@ -46,7 +48,7 @@ function bcli_entrypoint() {
 
 		# If the user provides help as the last argument on a directory, then
 		# show them the help for that directory rather than continuing
-		if [[ "${!cmd_arg_start}" == "help" || "${!cmd_arg_start}" == "--help" ]]; then
+		if [[ "${!cmd_arg_start}" == "help"  || "${!cmd_arg_start}" == "--help" ]]; then
 			# Strip off the "help" portion of the command
 			local args
 			args=("$@")
@@ -87,7 +89,8 @@ function bcli_entrypoint() {
 	# the command's help information.
 	arg_i=0 # We need the index to be able to strip list indices
 	for arg in "${cmd_args[@]}"; do
-		if [[ "${arg}" == "--help" && -f "$cmd_file.help" ]]; then
+    if [[ "${arg}" == "--help" && -f "$cmd_file.help" ]]; then
+		# if [[ "${arg}" == "--help" ]]; then
 			# Strip off the `--help` portion of the command
 			unset "cmd_args[$arg_i]"
 			cmd_args=("${cmd_args[@]}")
