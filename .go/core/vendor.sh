@@ -9,10 +9,10 @@ PATH=$PATH:$(git --exec-path)
 # overrides location of ./go vendor add
 ADD_PATH="${ADD_PATH:-}"
 
-ADD="./go vendor add [--prefix <path>] <name> <repository> [<ref>]"
-LIST="./go vendor list [<name>]"
-REMOVE="./go vendor remove <name>"
-UPDATE="./go vendor update <name> [<ref>]"
+ADD="./go core vendor add [--prefix <path>] <name> <repository> [<ref>]"
+LIST="./go core vendor list [<name>]"
+REMOVE="./go core vendor remove <name>"
+UPDATE="./go core vendor update <name> [<ref>]"
 _usage() {
   cat <<EOF
 Usage:

@@ -28,7 +28,6 @@ function bcli_trim_whitespace() {
 
 function bcli_show_header() {
   echo -e "$(bcli_trim_whitespace "$(cat "$1/.name")")"
-  echo -e "${COLOR_CYAN}Version  ${COLOR_NORMAL}$(bcli_trim_whitespace "$(cat "$1/.version")")"
 }
 
 function bcli_entrypoint() {
