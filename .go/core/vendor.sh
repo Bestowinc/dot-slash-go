@@ -2,15 +2,17 @@
 
 set -eof pipefail
 
+ROOT_DIR="${ROOT_DIR:-.}"
+VENDOR_FILE=${VENDOR_FILE:-"$ROOT_DIR/.go/.vendor-git"}
+VENDOR_DIR=${VENDOR_DIR:-".go/.vendor/git"}
+PATH=$PATH:$(git --exec-path)
+# overrides location of ./go vendor add
+ADD_PATH="${ADD_PATH:-}"
+
 ADD="./go vendor add [--prefix <path>] <name> <repository> [<ref>]"
 LIST="./go vendor list [<name>]"
 REMOVE="./go vendor remove <name>"
 UPDATE="./go vendor update <name> [<ref>]"
-ROOT_DIR="${ROOT_DIR:-.}"
-VENDOR_FILE=${VENDOR_FILE:-"$ROOT_DIR/.go/.git-vendor"}
-VENDOR_DIR=${VENDOR_DIR:-".go/.vendor/git"}
-PATH=$PATH:$(git --exec-path)
-
 _usage() {
   cat <<EOF
 Usage:
@@ -22,19 +24,19 @@ Usage:
 EOF
 }
 
+case "$1" in
+"" | -h | --help) _usage && exit ;;
+esac
+
 # shellcheck disable=SC1091
 source git-sh-setup
 
 require_work_tree # git-sh-setup
 
-case "$1" in
-"" | "-h" | "--help") _usage && exit ;;
-esac
-
 command="$1"
 shift
 case "$command" in
-"add" | "list" | "remove" | "update") ;;
+add | list | remove | update) ;;
 *) echo >&2 "error: unknown command \"$command\"" && _usage && exit 1 ;;
 esac
 
@@ -60,13 +62,15 @@ add() {
   if [ $# -lt 2 ]; then
     die "Incorrect options provided: $ADD"
   fi
+
   local name="$1"
   local repo="$2"
   local ref="$3"
   local commit
-  local path
-
-  path="$VENDOR_DIR/$(echo "$repo" | sed -E 's#^[a-zA-Z]+((://)|@)##' | sed 's#:#/#' | sed -E 's/\.git$//')"
+  local path="$ADD_PATH"
+  if [ -n "$path" ]; then
+    path="$VENDOR_DIR/$(echo "$repo" | sed -E 's#^[a-zA-Z]+((://)|@)##' | sed 's#:#/#' | sed -E 's/\.git$//')"
+  fi
 
   # check for existence of vendor file and duplicate name/path
   if [ ! -s "$VENDOR_FILE" ]; then
