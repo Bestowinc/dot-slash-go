@@ -124,14 +124,7 @@ list() {
     local ref
     local commit
     case "$key" in
-    "{") {
-      unset modified
-      unset name
-      unset path
-      unset repo
-      unset ref
-      unset commit
-    } ;;
+    "{") unset modified name path repo ref commit ;;
     name:) name="$val" ;;
     path:) path="$val" ;;
     repo:) repo="$val" ;;
@@ -169,7 +162,7 @@ update() {
   local message
   # shellcheck disable=SC2094
   while read -r key val; do {
-    ((line++))
+    line="$((line+1))"
     local commit
     local commit_line
     local path
@@ -177,7 +170,7 @@ update() {
     local ref
     local repo
     case "$key" in
-    "{") ;;
+    "{") unset commit commit_line path ref_line ref repo ;;
     name:) {
       if [[ "$val" == "$name" ]]; then
         found="true"
