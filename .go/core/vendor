@@ -57,12 +57,12 @@ get_commit() {
   git ls-remote "$repo" "$ref" | awk '{print $1}'
 }
 
+
 add() {
   require_clean_work_tree
   if [ $# -lt 2 ]; then
     die "Incorrect options provided: $ADD"
   fi
-
   local name="$1"
   local repo="$2"
   local ref="$3"
@@ -274,6 +274,17 @@ remove() {
     git rm -rf "$path"
     git commit --message "Removing $name from $rm_path"
   fi
+}
+
+# for first time dot-slash-go-setup
+init() {
+  local vendor="${INIT_DIR:-.vendor/github.com/Bestowinc/dot-slash-go}"
+  add dot-slash-go https://github.com/Bestowinc/dot-slash-go vendor_basics
+  ln -s "$vendor/.go/core" .go/core 
+  ln -s "$vendor/.go/core.usage" .go/core.usage
+  ln -s ".go/$vendor/go" ./go
+  git add go .go
+  git commit --amend --no-edit
 }
 
 # Run the command
