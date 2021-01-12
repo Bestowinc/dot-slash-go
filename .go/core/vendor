@@ -279,7 +279,7 @@ remove() {
 # for first time dot-slash-go-setup
 init() {
   local vendor="${INIT_DIR:-.vendor/github.com/Bestowinc/dot-slash-go}"
-  add dot-slash-go https://github.com/Bestowinc/dot-slash-go vendor_basics
+  add dot-slash-go https://github.com/Bestowinc/dot-slash-go
   ln -s "$vendor/.go/core" .go/core 
   ln -s "$vendor/.go/core.usage" .go/core.usage
   ln -s ".go/$vendor/go" ./go
