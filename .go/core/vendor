@@ -36,7 +36,7 @@ require_work_tree # git-sh-setup
 command="$1"
 shift
 case "$command" in
-add | list | remove | update) ;;
+add | list | remove | update| init) ;;
 *) echo >&2 "error: unknown command \"$command\"" && _usage && exit 1 ;;
 esac
 
