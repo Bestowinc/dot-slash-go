@@ -161,7 +161,6 @@ update() {
     force="$3"
   fi
 
-
   local line=0
   local found
   local update_file
@@ -237,14 +236,15 @@ EOF
     local pre_update_commit
     pre_update_commit="$(git log -1 --format=%H)"
 
-    echo "$update_file" >"$VENDOR_FILE" && \
-    rm -rf "$path" && \
-    git add "$VENDOR_FILE" "$path" && \
-    git commit --message "$message" --quiet && \
-    git subtree add --prefix "$path" "$repo" "$update_ref" --squash && \
-    git reset --soft HEAD^^ --quiet && \
-    git commit --message "$message" || \
-    git reset --hard "$pre_update_commit"
+    {
+      echo "$update_file" >"$VENDOR_FILE" &&
+        rm -rf "$path" &&
+        git add "$VENDOR_FILE" "$path" &&
+        git commit --message "$message" --quiet &&
+        git subtree add --prefix "$path" "$repo" "$update_ref" --squash &&
+        git reset --soft HEAD^^ --quiet &&
+        git commit --message "$message"
+    } || git reset --hard "$pre_update_commit"
   fi
 }
 
