@@ -2,7 +2,6 @@
 
 set -eof pipefail
 
-
 ROOT_DIR="${ROOT_DIR:-.}"
 DEP_FILE=${DEP_FILE:-"$ROOT_DIR/.go/.dep"}
 BIN_DIR=${BIN_DIR:-"$ROOT_DIR/.go/.bin"}
@@ -11,7 +10,11 @@ PATH=$BIN_DIR:$PATH
 # shellcheck source=.go/core/common.sh
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
+# dep updates/installs binaries to $BIN_DIR or checks the existence of a CLI tool in $PATH
 dep() {
+  if [[ "$2" == "--no-install" ]]; then
+    no_install "$1"
+  fi
   # .dep manifest arguments
   #######################################################
   local name="$1" # name of the command line tool
@@ -56,17 +59,19 @@ dep() {
   fi
 }
 
+# read_manifest reads through and returns .dep manifest arguments for a given tool
 read_manifest() {
   local name="$1"
   local dep_file="$2"
+  local found=0
+  local varg
+  local vnum
+  local darwin_ref
+  local linux_ref
+  local url
+  local tar_dir
 
   while read -r key val; do {
-    local varg
-    local vnum
-    local darwin_ref
-    local linux_ref
-    local url
-    local tar_dir
     case "$key" in
     "{") {
       unset varg
@@ -78,7 +83,7 @@ read_manifest() {
     } ;;
     name:) {
       if [[ "$val" == "$name" ]]; then
-        found="true"
+        found=1
       fi
     } ;;
     varg:) varg="$val" ;;
@@ -89,7 +94,7 @@ read_manifest() {
     tar_dir:) tar_dir="$val" ;;
     "}")
       {
-        if [ -z "$found" ]; then
+        if [[ "$found" == 0 ]]; then
           continue # keep iterating if name match not found
         fi
 
@@ -103,18 +108,22 @@ read_manifest() {
         url="$(eval echo "$url")"
         tar_dir="$(eval echo "$tar_dir")"
 
-        # return defs
-        echo "$varg"
-        echo "$vnum"
-        echo "$os_ref"
-        echo "$url"
-        echo "$tar_dir"
       }
       ;;
     esac
   }; done <"$dep_file"
+  if [[ "$found" == 1 ]]; then
+    fail "$name is not present in $DEP_FILE!"
+  fi
+  # return defs
+  echo "$varg"
+  echo "$vnum"
+  echo "$os_ref"
+  echo "$url"
+  echo "$tar_dir"
 }
 
+# get_det curls a tar.gz url and untars the result to $BIN_DIR
 get_dep() {
   local name="$1"
   local url="$2"
@@ -126,6 +135,8 @@ get_dep() {
   curl -SLk "${url}" | tar xvz --strip-components "$strip_count" -C "$BIN_DIR" "$tar_dir"
 }
 
+# version invites a tool's '--version' subcommand to return a string's stdout and stderr output to look
+# for a semantic vesrion
 version() {
   local name="$1"
   local varg="$2"
@@ -137,6 +148,7 @@ version() {
   echo "$vnum"
 }
 
+# is_latest returns an exit code of three if a tool's semantic version is less than the one listed in the dep file
 is_latest() {
   local name="$1"
   local expected_version="$2"
@@ -152,4 +164,13 @@ is_latest() {
     return 3
   fi
   return 0
+}
+
+no_install() {
+  command -v $1 1>/dev/null || which_err_code=$?
+
+  if [[ "${which_err_code}" -eq 1 ]]; then
+    # call the error function
+    fail "\ndep: $1 not found in \$PATH"
+  fi
 }
