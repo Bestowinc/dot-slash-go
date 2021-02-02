@@ -1,0 +1,28 @@
+# dep-local
+# ${vnum} - version number
+# ${os_ref} - will substitute for 'darwin_ref' or 'linux_ref' depending on $OSTYPE
+##################################################################################
+{
+	name:	cogs
+	varg:	--version
+	vnum:	0.6.2
+	darwin_ref:	Darwin
+	linux_ref:	Linux
+  url: https://github.com/Bestowinc/cogs/releases/download/v${vnum}/cogs_${vnum}_${os_ref}_x86_64.tar.gz
+}
+{
+	name:	gofaker
+	varg:	--version
+	vnum:	0.3.0
+	darwin_ref:	Darwin
+	linux_ref:	Linux
+  url: https://github.com/mkatychev/faker-cli/releases/download/v${vnum}/faker-cli_${vnum}_${os_ref}_x86_64.tar.gz
+}
+{
+	name:	dark
+	varg:	version
+	vnum:	0.6.0
+	darwin_ref:	apple-darwin
+	linux_ref: unknown-linux-musl
+  url: https://github.com/Bestowinc/darkroom/releases/download/${vnum}/darkroom-${vnum}-x86_64-${os_ref}.tar.gz
+}

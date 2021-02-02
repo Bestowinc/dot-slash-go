@@ -115,6 +115,10 @@ EOF
 }
 
 list() {
+  if [ ! -s "$VENDOR_FILE" ]; then
+    echo "$VENDOR_FILE" does not exist
+    exit 0
+  fi
   local show_only="$1"
   while read -r key val; do {
     local name

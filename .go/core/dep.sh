@@ -12,9 +12,6 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 # dep updates/installs binaries to $BIN_DIR or checks the existence of a CLI tool in $PATH
 dep() {
-  if [[ "$2" == "--no-install" ]]; then
-    no_install "$1"
-  fi
   # .dep manifest arguments
   #######################################################
   local name="$1" # name of the command line tool
@@ -30,7 +27,13 @@ dep() {
     read -r os_ref
     read -r url
     read -r tar_dir
+    read -r found
   } <<<"$(read_manifest "$name" "$DEP_FILE")"
+
+  if [[ "$found" == 0 ]]; then
+    # shellcheck disable=SC2046
+    return $(verify_path "$name")
+  fi
 
   if [ ! -d "$BIN_DIR" ]; then
     mkdir "$BIN_DIR"
@@ -74,12 +77,9 @@ read_manifest() {
   while read -r key val; do {
     case "$key" in
     "{") {
-      unset varg
-      unset vnum
-      unset darwin_ref
-      unset linux_ref
-      unset url
-      unset tar_dir
+      if [[ "$found" == 1 ]]; then
+        break
+      fi
     } ;;
     name:) {
       if [[ "$val" == "$name" ]]; then
@@ -95,6 +95,7 @@ read_manifest() {
     "}")
       {
         if [[ "$found" == 0 ]]; then
+          unset varg vnum darwin_ref linux_ref url tar_dir
           continue # keep iterating if name match not found
         fi
 
@@ -112,15 +113,13 @@ read_manifest() {
       ;;
     esac
   }; done <"$dep_file"
-  if [[ "$found" == 1 ]]; then
-    fail "$name is not present in $DEP_FILE!"
-  fi
   # return defs
   echo "$varg"
   echo "$vnum"
   echo "$os_ref"
   echo "$url"
   echo "$tar_dir"
+  echo "$found"
 }
 
 # get_det curls a tar.gz url and untars the result to $BIN_DIR
@@ -142,6 +141,7 @@ version() {
   local varg="$2"
   # pull a valid semver value from the output, this should include
   # multiline --version calls such as "gh --version"
+  echo "$($name $varg)"
   if ! vnum=$($name "$varg" 2>&1 | grep -Eo "(\d+\.){1,}\d(-\w+)?"); then
     fail "\"$name $varg\" does not produce a version number!"
   fi
@@ -166,11 +166,11 @@ is_latest() {
   return 0
 }
 
-no_install() {
-  command -v $1 1>/dev/null || which_err_code=$?
+verify_path() {
+  command -v "$1" 1>/dev/null || which_err_code=$?
 
   if [[ "${which_err_code}" -eq 1 ]]; then
     # call the error function
-    fail "\ndep: $1 not found in \$PATH"
+    fail "\ndep: $1 not found in \$PATH, should it be added to $BIN_DIR?"
   fi
 }
