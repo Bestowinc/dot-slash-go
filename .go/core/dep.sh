@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-set -eof pipefail
+set -eo pipefail
 
 ROOT_DIR="${ROOT_DIR:-.}"
 DEP_FILE=${DEP_FILE:-"$ROOT_DIR/.go/.dep"}
 BIN_DIR=${BIN_DIR:-"$ROOT_DIR/.go/.bin"}
 PATH=$BIN_DIR:$PATH
 
-# shellcheck source=.go/core/common.sh
-source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+# shellcheck source=.go/core/utils.sh
+source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 # dep updates/installs binaries to $BIN_DIR or checks the existence of a CLI tool in $PATH
 dep() {
