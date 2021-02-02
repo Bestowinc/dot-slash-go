@@ -16,14 +16,14 @@ dep() {
   #######################################################
   local name="$1" # name of the command line tool
   local varg      # argument to call returning vesrion number
-  local vnum      # minimum expected version
+  local v_ref      # minimum expected version
   local os_ref    # pattern used to curl the correct tar file
   local url       # envsubst pattern used to seed the download link
   local tar_dir   # if file is not in root directory, provide location of file
   #######################################################
   {
     read -r varg
-    read -r vnum
+    read -r v_ref
     read -r os_ref
     read -r url
     read -r tar_dir
@@ -41,7 +41,7 @@ dep() {
 
   if [ ! -s "$BIN_DIR/$name" ]; then
     # attempt to install the tool if supported
-    warn "installing ${name} v${vnum}..."
+    warn "installing ${name} v${v_ref}..."
     get_dep "$name" "$url" "$tar_dir"
   fi
 
@@ -51,14 +51,17 @@ dep() {
 
   # check if local version is out of date for supported tools,  warn if out of date
   if [ -n "$eval_version" ]; then
-    is_latest "$name" "$vnum" "$eval_version"
-    if [[ $? == 3 ]]; then
+    local latest_return
+    is_latest "$name" "$v_ref" "$eval_version" || latest_return=$?
+    if [[ "$latest_return" == 3 ]]; then
+      warn "local version: ${eval_version}"
+      warn "expected version: ${v_ref}"
       warn "$name v${eval_version} is outdated"
-      warn "installing ${name} v${vnum}..."
+      warn "installing ${name} v${v_ref}..."
       get_dep "$name" "$url" "$tar_dir"
     fi
   else
-    fail "unable to install ${name} v${vnum}"
+    fail "unable to install ${name} v${v_ref}"
   fi
 }
 
@@ -68,7 +71,7 @@ read_manifest() {
   local dep_file="$2"
   local found=0
   local varg
-  local vnum
+  local v_ref
   local darwin_ref
   local linux_ref
   local url
@@ -87,7 +90,7 @@ read_manifest() {
       fi
     } ;;
     varg:) varg="$val" ;;
-    vnum:) vnum="$val" ;;
+    v_ref:) v_ref="$val" ;;
     darwin_ref:) darwin_ref="$val" ;;
     linux_ref:) linux_ref="$val" ;;
     url:) url="$val" ;;
@@ -95,7 +98,7 @@ read_manifest() {
     "}")
       {
         if [[ "$found" == 0 ]]; then
-          unset varg vnum darwin_ref linux_ref url tar_dir
+          unset varg v_ref darwin_ref linux_ref url tar_dir
           continue # keep iterating if name match not found
         fi
 
@@ -115,7 +118,7 @@ read_manifest() {
   }; done <"$dep_file"
   # return defs
   echo "$varg"
-  echo "$vnum"
+  echo "$v_ref"
   echo "$os_ref"
   echo "$url"
   echo "$tar_dir"
@@ -139,13 +142,13 @@ get_dep() {
 version() {
   local name="$1"
   local varg="$2"
+  local eval_version
   # pull a valid semver value from the output, this should include
   # multiline --version calls such as "gh --version"
-  echo "$($name $varg)"
-  if ! vnum=$($name "$varg" 2>&1 | grep -Eo "(\d+\.){1,}\d(-\w+)?"); then
+  if ! eval_version=$($name "$varg" 2>&1 | grep -Eo "(\d+\.){1,}\d(-\w+)?" | head -1); then
     fail "\"$name $varg\" does not produce a version number!"
   fi
-  echo "$vnum"
+  echo "$eval_version"
 }
 
 # is_latest returns an exit code of three if a tool's semantic version is less than the one listed in the dep file
@@ -160,17 +163,18 @@ is_latest() {
     sort -V -r | sed s/\.99999$// |
     head -n 1)
 
-  if [ "$latest_version" != "$eval_version" ]; then
+  if [[ "$latest_version" != "$eval_version" ]]; then
     return 3
   fi
   return 0
 }
 
 verify_path() {
+  local which_err_code=0
   command -v "$1" 1>/dev/null || which_err_code=$?
 
-  if [[ "${which_err_code}" -eq 1 ]]; then
+  if [[ "${which_err_code}" == 1 ]]; then
     # call the error function
-    fail "\ndep: $1 not found in \$PATH, should it be added to $BIN_DIR?"
+    fail "\ndep: $1 not found in \$PATH, should it be added to \"$BIN_DIR\"?"
   fi
 }

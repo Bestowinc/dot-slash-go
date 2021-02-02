@@ -48,7 +48,7 @@ function bcli_entrypoint() {
       args=("${args[@]}")
 
       bcli_help "$0" "${args[@]}"
-      exit 3
+      exit 101
     fi
 
     cmd_file="$cmd_file/${!cmd_arg_start}"
@@ -65,7 +65,7 @@ function bcli_entrypoint() {
   # to help them along.
   if [ -d "$cmd_file" ]; then
     bcli_help "$0" "$@"
-    exit 3
+    exit 101
   fi
 
   # If we didn't couldn't find the exact command the user entered then warn them
@@ -74,7 +74,7 @@ function bcli_entrypoint() {
     bcli_help "$0" "${@:1:$((cmd_arg_start - 1))}"
     echo >&2 -e "${COLOR_RED}We could not find the command ${COLOR_CYAN}$cli_entrypoint ${*:1:$cmd_arg_start}${COLOR_NORMAL}"
     echo >&2 -e "To help out, we've shown you the help docs for ${COLOR_CYAN}$cli_entrypoint ${*:1:$((cmd_arg_start - 1))}${COLOR_NORMAL}"
-    exit 3
+    exit 101
   fi
 
   # If --help is passed as one of the arguments to the command then show
@@ -88,7 +88,7 @@ function bcli_entrypoint() {
 
       # Pass the result to the help script for interrogation
       bcli_help "$0" "${@:1:$((cmd_arg_start - 1))}" "${cmd_args[@]}"
-      exit 3
+      exit 101
     fi
     arg_i=$((arg_i + 1))
   done
@@ -97,10 +97,10 @@ function bcli_entrypoint() {
   "$cmd_file" "${cmd_args[@]}"
   EXIT_CODE=$?
 
-  # If the command exited with an exit code of 3 (our "show help" code)
+  # If the command exited with an exit code of 101 (our "show help" code)
   # then show the help documentation for the command.
-  if [[ $EXIT_CODE == 3 ]]; then
-    "$ROOT_DIR/help" "$0" "$@"
+  if [[ $EXIT_CODE == 101 ]]; then
+    bcli_help "$0" "$@"
   fi
 
   # Exit with the same code as the command
@@ -177,3 +177,4 @@ function bcli_help() {
     echo ""
   fi
 }
+

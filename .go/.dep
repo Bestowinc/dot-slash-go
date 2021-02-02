@@ -1,28 +1,46 @@
 # dep-local
-# ${vnum} - version number
+# ${v_ref} - version number
 # ${os_ref} - will substitute for 'darwin_ref' or 'linux_ref' depending on $OSTYPE
 ##################################################################################
 {
 	name:	cogs
 	varg:	--version
-	vnum:	0.6.2
+	v_ref:	0.6.2
 	darwin_ref:	Darwin
 	linux_ref:	Linux
-  url: https://github.com/Bestowinc/cogs/releases/download/v${vnum}/cogs_${vnum}_${os_ref}_x86_64.tar.gz
+  url: https://github.com/Bestowinc/cogs/releases/download/v${v_ref}/cogs_${v_ref}_${os_ref}_x86_64.tar.gz
 }
 {
 	name:	gofaker
 	varg:	--version
-	vnum:	0.3.0
+	v_ref:	0.3.0
 	darwin_ref:	Darwin
 	linux_ref:	Linux
-  url: https://github.com/mkatychev/faker-cli/releases/download/v${vnum}/faker-cli_${vnum}_${os_ref}_x86_64.tar.gz
+  url: https://github.com/mkatychev/faker-cli/releases/download/v${v_ref}/faker-cli_${v_ref}_${os_ref}_x86_64.tar.gz
 }
 {
 	name:	dark
 	varg:	version
-	vnum:	0.6.0
+	v_ref:	0.6.0
 	darwin_ref:	apple-darwin
 	linux_ref: unknown-linux-musl
-  url: https://github.com/Bestowinc/darkroom/releases/download/${vnum}/darkroom-${vnum}-x86_64-${os_ref}.tar.gz
+  url: https://github.com/Bestowinc/darkroom/releases/download/${v_ref}/darkroom-${v_ref}-x86_64-${os_ref}.tar.gz
+}
+{
+	name:	gh
+	varg:	--version
+	v_ref:	1.5.0
+	darwin_ref:	macOS
+	linux_ref: linux
+  url: https://github.com/cli/cli/releases/download/v${v_ref}/gh_${v_ref}_${os_ref}_amd64.tar.gz
+  tar_dir: gh_${v_ref}_${os_ref}_amd64/bin/gh
+}
+{
+	name:	rg
+	varg:	--version
+	v_ref:	12.1.1
+	darwin_ref:	apple-darwin
+	linux_ref: unknown-linux-musl
+  url: https://github.com/BurntSushi/ripgrep/releases/download/${v_ref}/ripgrep-${v_ref}-x86_64-${os_ref}.tar.gz
+  tar_dir: ripgrep-${v_ref}-x86_64-${os_ref}/rg
 }
