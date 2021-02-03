@@ -16,7 +16,7 @@ dep() {
   #######################################################
   local name="$1" # name of the command line tool
   local varg      # argument to call returning vesrion number
-  local v_ref      # minimum expected version
+  local v_ref     # minimum expected version
   local os_ref    # pattern used to curl the correct tar file
   local url       # envsubst pattern used to seed the download link
   local tar_dir   # if file is not in root directory, provide location of file
@@ -145,7 +145,7 @@ version() {
   local eval_version
   # pull a valid semver value from the output, this should include
   # multiline --version calls such as "gh --version"
-  if ! eval_version=$($name "$varg" 2>&1 | grep -Eo "(\d+\.){1,}\d(-\w+)?" | head -1); then
+  if ! eval_version=$($name "$varg" 2>&1 | grep -Eo "([0-9]+\.){1,}[0-9](-\w+)?" | head -1); then
     fail "\"$name $varg\" does not produce a version number!"
   fi
   echo "$eval_version"
