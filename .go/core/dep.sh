@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-ROOT_DIR="${ROOT_DIR:-.}"
+ROOT_DIR="${ROOT_DIR:-../..}"
 DEP_FILE=${DEP_FILE:-"$ROOT_DIR/.go/.dep"}
 BIN_DIR=${BIN_DIR:-"$ROOT_DIR/.go/.bin"}
 PATH=$BIN_DIR:$PATH

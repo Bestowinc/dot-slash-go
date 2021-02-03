@@ -2,7 +2,7 @@
 
 set -eof pipefail
 
-ROOT_DIR="${ROOT_DIR:-.}"
+ROOT_DIR="${ROOT_DIR:-../..}"
 VENDOR_FILE=${VENDOR_FILE:-"$ROOT_DIR/.go/.git-vendor"}
 VENDOR_DIR=${VENDOR_DIR:-".go/.vendor/git"}
 PATH=$PATH:$(git --exec-path)

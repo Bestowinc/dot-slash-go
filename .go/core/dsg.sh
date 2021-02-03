@@ -4,10 +4,8 @@ ROOT_DIR="${ROOT_DIR:-../..}"
 
 # shellcheck source=.go/core/utils.sh
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
-# shellcheck source=.go/core/dep.sh
-source "$(dirname "${BASH_SOURCE[0]}")/dep.sh"
 
-function bcli_trim_whitespace() {
+function dsg_trim_whitespace() {
   # Function courtesy of http://stackoverflow.com/a/3352015
   local var="$*"
   var="${var#"${var%%[![:space:]]*}"}" # remove leading whitespace characters
@@ -15,11 +13,11 @@ function bcli_trim_whitespace() {
   echo -n "$var"
 }
 
-function bcli_show_header() {
-  echo -e "$(bcli_trim_whitespace "$(cat "$1/.name")")"
+function dsg_show_header() {
+  echo -e "$(dsg_trim_whitespace "$(cat "$1/.name")")"
 }
 
-function bcli_entrypoint() {
+function dsg_entrypoint() {
   local cli_entrypoint
   cli_entrypoint=$(basename "$0")
 
@@ -40,7 +38,7 @@ function bcli_entrypoint() {
       unset "args[$((cmd_arg_start - 1))]"
       args=("${args[@]}")
 
-      bcli_help "$0" "${args[@]}"
+      dsg_help "$0" "${args[@]}"
       exit 101
     fi
 
@@ -57,14 +55,14 @@ function bcli_entrypoint() {
   # hasn't completed their command, so we'll show them the help for that directory
   # to help them along.
   if [ -d "$cmd_file" ]; then
-    bcli_help "$0" "$@"
+    dsg_help "$0" "$@"
     exit 101
   fi
 
   # If we didn't couldn't find the exact command the user entered then warn them
   # about it, and try to be helpful by displaying help for that directory.
   if [[ ! -f "$cmd_file" ]]; then
-    bcli_help "$0" "${@:1:$((cmd_arg_start - 1))}"
+    dsg_help "$0" "${@:1:$((cmd_arg_start - 1))}"
     echo >&2 -e "${COLOR_RED}We could not find the command ${COLOR_CYAN}$cli_entrypoint ${*:1:$cmd_arg_start}${COLOR_NORMAL}"
     echo >&2 -e "To help out, we've shown you the help docs for ${COLOR_CYAN}$cli_entrypoint ${*:1:$((cmd_arg_start - 1))}${COLOR_NORMAL}"
     exit 101
@@ -80,7 +78,7 @@ function bcli_entrypoint() {
       cmd_args=("${cmd_args[@]}")
 
       # Pass the result to the help script for interrogation
-      bcli_help "$0" "${@:1:$((cmd_arg_start - 1))}" "${cmd_args[@]}"
+      dsg_help "$0" "${@:1:$((cmd_arg_start - 1))}" "${cmd_args[@]}"
       exit 101
     fi
     arg_i=$((arg_i + 1))
@@ -93,20 +91,20 @@ function bcli_entrypoint() {
   # If the command exited with an exit code of 101 (our "show help" code)
   # then show the help documentation for the command.
   if [[ $EXIT_CODE == 101 ]]; then
-    bcli_help "$0" "$@"
+    dsg_help "$0" "$@"
   fi
 
   # Exit with the same code as the command
   exit $EXIT_CODE
 }
 
-function bcli_help() {
+function dsg_help() {
   local cli_entrypoint
   cli_entrypoint=$(basename "$1")
 
   # If we don't have any additional help arguments, then show the app's header as well.
   if [ $# == 1 ]; then
-    bcli_show_header "$ROOT_DIR/.go"
+    dsg_show_header "$ROOT_DIR/.go"
   fi
 
   # Locate the correct level to display the helpfile for, either a directory
@@ -143,10 +141,10 @@ function bcli_help() {
         echo -en "${COLOR_GREEN}$cli_entrypoint ${COLOR_CYAN}${*:2:$((help_arg_start - 1))} $cmd ${COLOR_NORMAL}"
 
         if [[ -f "$file.usage" ]]; then
-          bcli_trim_whitespace "$(cat "$file.usage")"
+          dsg_trim_whitespace "$(cat "$file.usage")"
           echo ""
         elif [[ -d "$file" && -f "$file.usage" ]]; then
-          bcli_trim_whitespace "$(cat "$file/.usage")"
+          dsg_trim_whitespace "$(cat "$file/.usage")"
           echo ""
         elif [[ -d "$file" && ! -f "$file.usage" ]]; then
           echo -e "${COLOR_MAGENTA}...${COLOR_NORMAL}"
@@ -161,7 +159,7 @@ function bcli_help() {
 
   echo -en "${COLOR_GREEN}$cli_entrypoint ${COLOR_CYAN}${*:2:$((help_arg_start - 1))} ${COLOR_NORMAL}"
   if [[ -f "$help_file.usage" ]]; then
-    bcli_trim_whitespace "$(cat "$help_file.usage")"
+    dsg_trim_whitespace "$(cat "$help_file.usage")"
     echo ""
   else
     echo ""
@@ -172,4 +170,3 @@ function bcli_help() {
     echo ""
   fi
 }
-
