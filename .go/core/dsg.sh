@@ -145,9 +145,11 @@ function bcli_help() {
         if [[ -f "$file.usage" ]]; then
           bcli_trim_whitespace "$(cat "$file.usage")"
           echo ""
-        elif [[ -d "$file" ]]; then
-          bcli_trim_whitespace "$(cat "$file/.usage")" || echo -e "${COLOR_MAGENTA}...${COLOR_NORMAL}"
+        elif [[ -d "$file" && -f "$file.usage" ]]; then
+          bcli_trim_whitespace "$(cat "$file/.usage")"
           echo ""
+        elif [[ -d "$file" && ! -f "$file.usage" ]]; then
+          echo -e "${COLOR_MAGENTA}...${COLOR_NORMAL}"
         else
           echo ""
         fi

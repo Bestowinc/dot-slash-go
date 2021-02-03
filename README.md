@@ -43,10 +43,31 @@ provide a bit of additional context around how it works, when you should use it 
 In addition to providing help for commands, you may also provide it for directories to explain what
 their sub-commands are intended to achieve. To do this, simply add a `.help` file to the directory.
 
-## Credits
-This project is based on the excellent [Bash CLI](https://github.com/SierraSoftworks/bash-cli).
-Some changes were made to better fit the needs of a go script. 
 
+## `./go core`
+
+`./go core vendor` and `./go core update` uses `git subtree` to vendor git repositories including dot-slash-go itself, the vendored git directories are defined in `.go/.git-vendor`:
+
+```
+Core dot-slash-go functionality commands
+
+Usage:
+  ./go core update
+  ./go core vendor (add|list|remove|update) [options]
+
+Commands:
+  update     runs `./go core vendor update dot-slash-go` from root directory
+  vendor     adds, lists, removes, or updates a vendored git repository
+```
+
+`./go core update` will pull changes from the upstream dot-slash-go repo defined in `.go/.git-vendor`
+
+## Credits
+This is based on these projects:
+* [Bash CLI](https://github.com/SierraSoftworks/bash-cli)
+* [git-vendor](https://github.com/brettlangdon/git-vendor)
+
+Some changes include
 * Consolidation of main logic to a single file
 * Removal of install/uninstall commands
 * Storage of commands and metadata in .go rather than app
