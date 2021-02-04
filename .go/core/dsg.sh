@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ROOT_DIR="${ROOT_DIR:-../..}"
+ROOT_DIR="${ROOT_DIR:-$(git rev-parse --show-toplevel)}"
 
 # shellcheck source=.go/core/utils.sh
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"

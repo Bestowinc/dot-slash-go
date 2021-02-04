@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
 set -eof pipefail
-set -x
 
-ROOT_DIR="${ROOT_DIR:-../..}"
+ROOT_DIR="${ROOT_DIR:-$(git rev-parse --show-toplevel)}"
 VENDOR_FILE=${VENDOR_FILE:-"$ROOT_DIR/.go/.git-vendor"}
 VENDOR_DIR=${VENDOR_DIR:-".go/.vendor/git"}
 PATH=$PATH:$(git --exec-path)
@@ -74,7 +73,6 @@ add() {
 
   # check for existence of vendor file and duplicate name/path
   if [ -s "$VENDOR_FILE" ]; then
-    echo "$VENDOR_FILE"
     grep -Eq "name:\s+$name" "$VENDOR_FILE" && die "name: $name already exists in git-vendor file"
     grep -Eq "path:\s+$path" "$VENDOR_FILE" && die "path: $path already exists in git-vendor file"
   fi

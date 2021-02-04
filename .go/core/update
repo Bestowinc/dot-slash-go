@@ -2,5 +2,5 @@
 
 set -eof pipefail
 
-ROOT_DIR="${ROOT_DIR:-.}"
+ROOT_DIR="${ROOT_DIR:-$(git rev-parse --show-toplevel)}"
 "$(dirname "$0")/vendor" update dot-slash-go
