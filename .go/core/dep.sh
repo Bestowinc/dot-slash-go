@@ -130,7 +130,11 @@ get_dep() {
   # count the # of directories to strip by amount of forward slashes
   local strip_count=${#dir_nesting}
 
-  curl -SLk "${url}" | tar xvz --strip-components "$strip_count" -C "$BIN_DIR" "$tar_path"
+  if [[ $url =~ ^github://.+$ ]]; then
+    download_github "$url" | tar xvz --strip-components "$strip_count" -C "$BIN_DIR" "$tar_path"
+  else
+    curl -SLk "${url}" | tar xvz --strip-components "$strip_count" -C "$BIN_DIR" "$tar_path"
+  fi
 }
 
 # version invites a tool's '--version' subcommand to return a string's stdout and stderr output to look
@@ -173,4 +177,37 @@ verify_path() {
     # call the error function
     fail "\ndep: $1 not found in \$PATH, should it be added to \"$BIN_DIR\"?"
   fi
+}
+
+function gh_curl() {
+
+  curl -H "Authorization: token $GITHUB_OAUTH_TOKEN" \
+       -H "Accept: application/vnd.github.v3.raw" \
+       "$@"
+}
+
+function download_github() {
+  local url="$1"
+
+  regex="github:\/\/([^\/]+\/[^\/]+)\/([^\/]+)\/([^\/]+)"
+
+  if [[ $url =~ $regex ]]
+    then
+        repo="${BASH_REMATCH[1]}"
+        tag="${BASH_REMATCH[2]}"
+        file="${BASH_REMATCH[3]}"
+    else
+        echo "$url is not a github repo url"
+    fi
+
+  parser=". | map(select(.tag_name == \"$tag\"))[0].assets | map(select(.name == \"$file\"))[0].id"
+
+  asset_id=$(gh_curl -s https://api.github.com/repos/$repo/releases | jq "$parser")
+  if [ "$asset_id" = "null" ]; then
+    echo "ERROR: version not found $tag"
+    exit 1
+  fi;
+
+  curl -SLk -H "Authorization: token $GITHUB_OAUTH_TOKEN" -H 'Accept:application/octet-stream' \
+      "https://api.github.com/repos/$repo/releases/assets/$asset_id"
 }
