@@ -111,7 +111,7 @@ read_manifest() {
       }
       ;;
     esac
-  }; done <"$dep_file"
+  } done <"$dep_file"
   # return defs
   echo "${varg:-}"
   echo "${v_ref:-}"
@@ -127,10 +127,16 @@ get_dep() {
   local url="$2"
   local tar_path="${3:-$1}"
   local dir_nesting="${tar_path//[^\/]/}"
-  # count the # of directories to strip by amount of forward slashes
+  # count the number of directories to strip by amount of forward slashes
   local strip_count=${#dir_nesting}
 
-  if [[ $url =~ ^github://.+$ ]]; then
+  if [[ ! "${url}" =~ "tar" ]]; then
+    # Some GitHub release files are not wrapped by an archive, like SOPS
+    curl -SLk "${url}" >"$tar_path"
+    mv "$tar_path" "$BIN_DIR/$name"
+    chmod u+x "$BIN_DIR/$name"
+  elif [[ $url =~ ^github://.+$ ]]; then
+    # GitHub releases
     download_github "$url" | tar xvz --strip-components "$strip_count" -C "$BIN_DIR" "$tar_path"
   else
     curl -SLk "${url}" | tar xvz --strip-components "$strip_count" -C "$BIN_DIR" "$tar_path"
@@ -182,8 +188,8 @@ verify_path() {
 function gh_curl() {
 
   curl -H "Authorization: token $GITHUB_OAUTH_TOKEN" \
-       -H "Accept: application/vnd.github.v3.raw" \
-       "$@"
+    -H "Accept: application/vnd.github.v3.raw" \
+    "$@"
 }
 
 function download_github() {
@@ -191,23 +197,22 @@ function download_github() {
 
   regex="github:\/\/([^\/]+\/[^\/]+)\/([^\/]+)\/([^\/]+)"
 
-  if [[ $url =~ $regex ]]
-    then
-        repo="${BASH_REMATCH[1]}"
-        tag="${BASH_REMATCH[2]}"
-        file="${BASH_REMATCH[3]}"
-    else
-        echo "$url is not a github repo url"
-    fi
+  if [[ $url =~ $regex ]]; then
+    repo="${BASH_REMATCH[1]}"
+    tag="${BASH_REMATCH[2]}"
+    file="${BASH_REMATCH[3]}"
+  else
+    echo "$url is not a github repo url"
+  fi
 
   parser=". | map(select(.tag_name == \"$tag\"))[0].assets | map(select(.name == \"$file\"))[0].id"
 
-  asset_id=$(gh_curl -s https://api.github.com/repos/$repo/releases | jq "$parser")
+  asset_id=$(gh_curl -s "https://api.github.com/repos/$repo/releases" | jq "$parser")
   if [ "$asset_id" = "null" ]; then
     echo "ERROR: version not found $tag"
     exit 1
-  fi;
+  fi
 
   curl -SLk -H "Authorization: token $GITHUB_OAUTH_TOKEN" -H 'Accept:application/octet-stream' \
-      "https://api.github.com/repos/$repo/releases/assets/$asset_id"
+    "https://api.github.com/repos/$repo/releases/assets/$asset_id"
 }
