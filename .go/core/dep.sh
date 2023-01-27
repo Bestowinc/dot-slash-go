@@ -4,6 +4,7 @@ ROOT_DIR="${ROOT_DIR:-$(git rev-parse --show-toplevel)}"
 DEP_FILE=${DEP_FILE:-"$ROOT_DIR/.go/.dep"}
 BIN_DIR=${BIN_DIR:-"$ROOT_DIR/.go/.bin"}
 PATH=$BIN_DIR:$PATH
+ARCH=$(uname -m)
 
 # shellcheck source=.go/core/utils.sh
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
@@ -13,7 +14,7 @@ dep() {
   # .dep manifest arguments
   ############################################################################
   local name="$1" # name of the command line tool
-  local varg      # argument to call returning vesrion number
+  local varg      # argument to call returning version number
   local v_ref     # minimum expected version
   local os_ref    # pattern used to curl the correct tar file
   local url       # envsubst pattern used to seed the download link
@@ -72,6 +73,7 @@ read_manifest() {
   local linux_ref
   local url
   local tar_path
+  local arch_ref=$ARCH
 
   while read -r key val; do {
     case "$key" in
@@ -163,8 +165,10 @@ is_latest() {
   local expected_version="$2"
   local eval_version="$3"
   # expected: $1 actual $2
+  # sed -E 's/^-e //' is to remove the "-e " from the first line because echo -e is not a valid option in sh
   # sort -V means sort by semantic version and return latest version
   latest_version=$(echo -e "$expected_version\n$eval_version" |
+    sed -E 's/^-e //' |
     sed -E "s/([0-9]+\.[0-9]+\.[0-9]+$)/\1\.99999/" |
     sort -V -r | sed s/\.99999$// |
     head -n 1)
