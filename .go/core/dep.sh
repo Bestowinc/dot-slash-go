@@ -73,6 +73,7 @@ read_manifest() {
   local linux_ref
   local url
   local tar_path
+  # shellcheck disable=SC2034
   local arch_ref=$ARCH
 
   while read -r key val; do {
