@@ -38,7 +38,7 @@ dep() {
     mkdir "$BIN_DIR"
   fi
 
-  if [ ! -s "$BIN_DIR/$name" ]; then
+  if [ ! -s "$BIN_DIR/$name" ] && [ ! -x "$(command -v "$name")" ]; then
     # attempt to install the tool if supported
     warn "installing ${name} v${v_ref}..."
     get_dep "$name" "$url" "$tar_path"
@@ -73,6 +73,7 @@ read_manifest() {
   local linux_ref
   local url
   local tar_path
+  # shellcheck disable=SC2034
   local arch_ref=$ARCH
 
   while read -r key val; do {
