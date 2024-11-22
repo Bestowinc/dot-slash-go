@@ -154,7 +154,7 @@ version() {
   local eval_version
   # pull a valid semver value from the output, this should include
   # multiline --version calls such as "gh --version"
-  if ! eval_version=$($name "$varg" 2>&1 | grep -Eo "([0-9]+\.){1,}[0-9](-\w+)?" | head -1); then
+  if ! eval_version=$($name "$varg" 2>&1 | grep -Eo "([0-9]+\.){1,}[0-9]*(-\w+)?" | head -1); then
     fail "\"$name $varg\" does not produce a version number!"
   fi
   echo "$eval_version"
