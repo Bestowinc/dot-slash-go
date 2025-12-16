@@ -58,7 +58,9 @@ dep() {
       get_dep "$name" "$url" "$tar_path"
     fi
   else
-    fail "unable to install ${name} v${v_ref}"
+    warn "\"$name $varg\" does not produce a version number, attempting install anyway."
+    warn "installing ${name} v${v_ref}..."
+    get_dep "$name" "$url" "$tar_path"
   fi
 }
 
@@ -147,7 +149,7 @@ get_dep() {
 }
 
 # version invites a tool's '--version' subcommand to return a string's stdout and stderr output to look
-# for a semantic vesrion
+# for a semantic version
 version() {
   local name="$1"
   local varg="$2"
@@ -155,7 +157,7 @@ version() {
   # pull a valid semver value from the output, this should include
   # multiline --version calls such as "gh --version"
   if ! eval_version=$($name "$varg" 2>&1 | grep -Eo "([0-9]+\.){1,}[0-9]*(-\w+)?" | head -1); then
-    fail "\"$name $varg\" does not produce a version number!"
+    return
   fi
   echo "$eval_version"
 }
